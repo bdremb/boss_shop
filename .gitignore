@@ -1,0 +1,9 @@
+node_modules/
+dist/
+release/
+*.log
+.vite/
+data/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
