@@ -1,4 +1,4 @@
-const { DatabaseSync } = require('node:sqlite')
+const { DatabaseSync } = require('./sqlite.cjs')
 const crypto = require('node:crypto')
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
@@ -13,10 +13,11 @@ function verifyPassword(password, saved) {
   return crypto.timingSafeEqual(candidate, Buffer.from(hash, 'hex'))
 }
 
-function openDatabase(filePath) {
-  const db = new DatabaseSync(filePath)
+function openDatabase(filePath, options = {}) {
+  const db = new DatabaseSync(filePath, options)
+  db.beginMigration()
+  try {
   db.exec(`
-    PRAGMA journal_mode = WAL;
     PRAGMA foreign_keys = ON;
     PRAGMA busy_timeout = 5000;
 
@@ -115,8 +116,27 @@ function openDatabase(filePath) {
     CREATE INDEX IF NOT EXISTS idx_stock_variant ON stock_movements(variant_id);
   `)
 
+  if (!db.prepare('PRAGMA table_info(product_variants)').all().some(column => column.name === 'stock_cost')) {
+    // Initialise only the current stock, never rewrite historical documents.
+    const { multiply } = require('./stock-cost.cjs')
+    const variants = db.prepare('SELECT id,quantity,purchase_price FROM product_variants').all()
+    db.exec('ALTER TABLE product_variants ADD COLUMN stock_cost INTEGER NOT NULL DEFAULT 0 CHECK(stock_cost >= 0)')
+    const update = db.prepare('UPDATE product_variants SET stock_cost=? WHERE id=?')
+    for (const variant of variants) update.run(multiply(variant.quantity, variant.purchase_price), variant.id)
+  }
+  if (!db.prepare('PRAGMA table_info(sales)').all().some(column => column.name === 'edit_version')) db.exec('ALTER TABLE sales ADD COLUMN edit_version INTEGER NOT NULL DEFAULT 0')
+  if (!db.prepare('PRAGMA table_info(sales)').all().some(column => column.name === 'request_key')) db.exec('ALTER TABLE sales ADD COLUMN request_key TEXT')
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_sales_request_key ON sales(request_key)')
+  require('./catalog.cjs').migrateCatalog(db)
+  require('./catalog.cjs').ensureHistorySnapshots(db)
   seed(db)
+  db.exec('COMMIT')
   return db
+  } catch (error) {
+    if (db.inTransaction) db.exec('ROLLBACK')
+    db.close()
+    throw error
+  }
 }
 
 function seed(db) {

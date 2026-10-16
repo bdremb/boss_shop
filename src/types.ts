@@ -10,6 +10,7 @@ export type Catalogs = {
   expenseCategories: (Lookup & { groupName: string })[]
 }
 export type Product = {
+  autoNumber?: number; photoKey?: string; productActive?: number; variantActive?: number
   variantId: number; productId: number; article: string; name: string; brand: string; categoryId?: number; category?: string
   subcategoryId?: number; subcategory?: string; supplierId?: number; supplier?: string; sizeId?: number; size: string; color: string
   quantity: number; purchasePrice?: number; retailPrice: number; barcode?: string; arrivalDate?: string; note?: string; lowStockThreshold: number

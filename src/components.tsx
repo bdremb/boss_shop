@@ -7,6 +7,16 @@ export function Button({ variant = 'primary', icon, children, ...props }: Button
   return <button className={`button ${variant}`} {...props}>{icon}{children}</button>
 }
 
+export function BrandMark() {
+  return <svg className="brand-mark" viewBox="0 0 80 76" role="img" aria-label="БОСС — учет магазина" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="currentColor" strokeWidth="3.1" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 8h26M8 8v25h20c4 0 6-2.5 6-6v-4c0-3.5-2-6-6-6H8"/>
+      <rect x="44" y="8" width="27" height="25" rx="5"/>
+      <path d="M34 45H14c-4 0-6 2.5-6 6v11c0 4 2 6 6 6h20M71 45H51c-4 0-6 2.5-6 6v11c0 4 2 6 6 6h20"/>
+    </g>
+  </svg>
+}
+
 export function Field({ label, hint, children, className='' }: { label?: string; hint?: string; children: ReactNode; className?: string }) {
   return <label className={`field ${className}`}>{label && <span className="field-label">{label}</span>}{children}{hint && <span className="field-hint">{hint}</span>}</label>
 }

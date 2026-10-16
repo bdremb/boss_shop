@@ -10,7 +10,7 @@ export const toCents = (value: string | number) => Math.round(Number(String(valu
 export const today = () => format(new Date(), 'yyyy-MM-dd')
 export const dateTimeLocal = () => format(new Date(), "yyyy-MM-dd'T'HH:mm")
 export const displayDate = (value?: string) => value ? format(new Date(value.replace(' ', 'T')), 'dd.MM.yyyy HH:mm') : '—'
-export const displayDay = (value?: string) => value ? format(new Date(value), 'dd.MM.yyyy') : '—'
+export const displayDay = (value?: string) => value ? [value.slice(8,10),value.slice(5,7),value.slice(0,4)].join('.') : '—'
 
 export function presetPeriod(key: string): Period {
   const now = new Date()

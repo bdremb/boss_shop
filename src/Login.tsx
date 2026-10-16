@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { ArrowRight, LockKeyhole, PackageCheck, ShieldCheck, TrendingUp } from 'lucide-react'
 import { login } from './api'
-import { Button, Field, Input } from './components'
+import { BrandMark, Button, Field, Input } from './components'
 
 export default function Login({ onLogin }: { onLogin:()=>void }) {
   const [loginValue,setLogin]=useState('admin'),[password,setPassword]=useState('admin123'),[error,setError]=useState(''),[busy,setBusy]=useState(false)
   async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try{await login(loginValue,password);onLogin()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
   return <main className="login-page">
     <section className="login-story">
-      <div className="brand light"><span>B</span><strong>Boss Shop</strong></div>
+      <div className="brand light"><BrandMark/><strong>Учет магазина</strong></div>
       <div className="story-content"><span className="eyebrow">Учет магазина одежды</span><h1>Все цифры бизнеса<br/>в одном месте.</h1><p>Остатки, продажи, расходы и реальная чистая прибыль — спокойно и без лишних таблиц.</p>
         <div className="story-features"><div><PackageCheck/><span><b>Точный склад</b>Движение каждого товара</span></div><div><TrendingUp/><span><b>Живая аналитика</b>От дня до полного года</span></div><div><ShieldCheck/><span><b>Доступ по ролям</b>Финансы видит только владелец</span></div></div>
       </div><div className="story-foot">Локальная база данных · работает без интернета</div>
